@@ -16,10 +16,10 @@ function getRandomArbitrary(min, max, positive = true) {
      }
 }
 
-const BOUNDARY_X_MIN = 10;
-const BOUNDARY_X_MAX = 950; // 100px less than container's width
-const BOUNDARY_Y_MIN = 10;
-const BOUNDARY_Y_MAX = 500; // 100px less than container's height
+const BOUNDARY_X_MIN = 0;
+const BOUNDARY_X_MAX = 1000; // 100px less than container's width
+const BOUNDARY_Y_MIN = 0;
+const BOUNDARY_Y_MAX = 600; // 100px less than container's height
 const BALL_SIZE_MAX = 18;
 const BALL_SIZE_MIN = 6;
 const MAX_SPEED = 1;
@@ -38,7 +38,7 @@ const container = document.getElementById("container");
 const ballArray = [];
 
 class Ball {
-     constructor(x = 0, y = 0, r = 5, vx = 0.5, vy = 0.5, color = "#EF476F") {
+     constructor(x, y, r, vx, vy, color) {
           this.x = x;
           this.y = y;
           this.r = r;
@@ -77,14 +77,26 @@ class Ball {
           }
      }
      handleBoxCollision() {
-          // left and right wall collision detection
-          if (this.x + this.r >= 1000 || this.x - this.r <= 0) {
+          // right wall collision
+          if (this.x + this.r > BOUNDARY_X_MAX) {
                this.vx = -this.vx;
+               this.x = BOUNDARY_X_MAX - this.r; // to prevent ball from getting stuck in the boundary
           }
-
-          //top and bottom wall collission detection
-          if (this.y + this.r >= 600 || this.y - this.r <= 0) {
+          // left wall collision
+          if (this.x - this.r < BOUNDARY_X_MIN) {
+               this.vx = -this.vx;
+               this.x = this.r; // to prevent ball from getting stuck in the boundary
+          }
+          //bottom wall collision
+          if (this.y + this.r > BOUNDARY_Y_MAX) {
+               //top and bottom wall collission detection
                this.vy = -this.vy;
+               this.y = BOUNDARY_Y_MAX - this.r;
+          }
+          // top wall collision
+          if (this.y - this.r < BOUNDARY_Y_MIN) {
+               this.vy = -this.vy;
+               this.y = this.r;
           }
      }
      handleBallCollision(i) {
@@ -110,7 +122,7 @@ class Ball {
                const moveX = penetrationDepth * Math.cos(angle); // consine gives x component
                const moveY = penetrationDepth * Math.sin(angle); // sine gives y component
 
-               this.x += moveX;
+               this.x += moveX; // moving the overlapping balls in opposite direction
                this.y += moveY;
                ballArray[i].x -= moveX;
                ballArray[i].y -= moveY;
