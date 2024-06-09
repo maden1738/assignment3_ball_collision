@@ -16,13 +16,13 @@ function getRandomArbitrary(min, max, positive = true) {
      }
 }
 
-const BOUNDARY_X_MIN = 3;
-const BOUNDARY_X_MAX = 700; // 100px less than container's width
-const BOUNDARY_Y_MIN = 3;
+const BOUNDARY_X_MIN = 10;
+const BOUNDARY_X_MAX = 950; // 100px less than container's width
+const BOUNDARY_Y_MIN = 10;
 const BOUNDARY_Y_MAX = 500; // 100px less than container's height
-const BALL_SIZE_MAX = 25;
-const BALL_SIZE_MIN = 9;
-const MAX_SPEED = 2;
+const BALL_SIZE_MAX = 20;
+const BALL_SIZE_MIN = 5;
+const MAX_SPEED = 1;
 const MIN_SPEED = 0.3;
 const colors = [
      "#EF476F",
@@ -33,7 +33,7 @@ const colors = [
      "#edf2fb",
 ];
 
-const BALL_COUNT = 50;
+const BALL_COUNT = 500;
 const container = document.getElementById("container");
 const ballArray = [];
 
@@ -89,7 +89,7 @@ class Ball {
      }
      handleBoxCollision() {
           // left and right wall collision detection
-          if (this.x + this.r >= 800 || this.x - this.r <= 0) {
+          if (this.x + this.r >= 1000 || this.x - this.r <= 0) {
                this.vx = -this.vx;
           }
 
@@ -103,10 +103,17 @@ class Ball {
           const dy = this.y - ballArray[i].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           // collision
-          console.log("collision");
           if (distance < this.r + ballArray[i].r) {
+               console.log("collision");
                this.vx = -this.vx;
                this.vy = -this.vy;
+
+               // prevents overlap
+               const penetrationDepth = this.r + ballArray[i].r - distance;
+               this.x += this.vx * penetrationDepth;
+               this.y += this.vy * penetrationDepth;
+               ballArray[i].x -= ballArray[i].vx * penetrationDepth;
+               ballArray[i].y -= ballArray[i].vy * penetrationDepth;
           }
      }
 }
