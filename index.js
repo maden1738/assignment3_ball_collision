@@ -1,9 +1,4 @@
-function getRandomInt(min, max) {
-     const minCeiled = Math.ceil(min);
-     const maxFloored = Math.floor(max);
-     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
-}
-
+// min inclusive
 function getRandomArbitrary(min, max, positive = true) {
      if (positive) {
           return Math.random() * (max - min) + min;
@@ -17,12 +12,12 @@ function getRandomArbitrary(min, max, positive = true) {
 }
 
 const BOUNDARY_X_MIN = 0;
-const BOUNDARY_X_MAX = 1000; // 100px less than container's width
+const BOUNDARY_X_MAX = 1000;
 const BOUNDARY_Y_MIN = 0;
-const BOUNDARY_Y_MAX = 600; // 100px less than container's height
+const BOUNDARY_Y_MAX = 600;
 const BALL_SIZE_MAX = 18;
 const BALL_SIZE_MIN = 6;
-const MAX_SPEED = 1;
+const MAX_SPEED = 1.2;
 const MIN_SPEED = 0.3;
 const colors = [
      "#EF476F",
@@ -89,7 +84,6 @@ class Ball {
           }
           //bottom wall collision
           if (this.y + this.r > BOUNDARY_Y_MAX) {
-               //top and bottom wall collission detection
                this.vy = -this.vy;
                this.y = BOUNDARY_Y_MAX - this.r;
           }
@@ -103,7 +97,7 @@ class Ball {
           const dx = this.x - ballArray[i].x;
           const dy = this.y - ballArray[i].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          // collision
+
           if (distance < this.r + ballArray[i].r) {
                // velocities are exchanged if masses are equal accordingto principle of elastic collision
 
@@ -133,16 +127,17 @@ class Ball {
 function initializeBalls() {
      for (let i = 0; i < BALL_COUNT; i++) {
           const ball = new Ball(
-               getRandomInt(BOUNDARY_X_MIN, BOUNDARY_X_MAX),
-               getRandomInt(BOUNDARY_Y_MIN, BOUNDARY_Y_MAX),
-               getRandomInt(BALL_SIZE_MIN / 2, BALL_SIZE_MAX / 2), //radius
-               getRandomArbitrary(MIN_SPEED, MAX_SPEED, false),
-               getRandomArbitrary(MIN_SPEED, MAX_SPEED, false),
-               colors[getRandomInt(0, colors.length)]
+               getRandomArbitrary(BOUNDARY_X_MIN, BOUNDARY_X_MAX),
+               getRandomArbitrary(BOUNDARY_Y_MIN, BOUNDARY_Y_MAX),
+               getRandomArbitrary(BALL_SIZE_MIN / 2, BALL_SIZE_MAX / 2), //radius
+               getRandomArbitrary(MIN_SPEED, MAX_SPEED, false), // speed can have positive or negative value
+               getRandomArbitrary(MIN_SPEED, MAX_SPEED, false), // speed can have positive or negative value
+               colors[Math.floor(getRandomArbitrary(0, colors.length))] // color index has to be an integer
           );
           ballArray.push(ball);
           container.appendChild(ball.element);
      }
+     console.log(ballArray);
 }
 
 function animate() {
