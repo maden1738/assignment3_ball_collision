@@ -20,8 +20,8 @@ const BOUNDARY_X_MIN = 10;
 const BOUNDARY_X_MAX = 950; // 100px less than container's width
 const BOUNDARY_Y_MIN = 10;
 const BOUNDARY_Y_MAX = 500; // 100px less than container's height
-const BALL_SIZE_MAX = 20;
-const BALL_SIZE_MIN = 5;
+const BALL_SIZE_MAX = 18;
+const BALL_SIZE_MIN = 6;
 const MAX_SPEED = 1;
 const MIN_SPEED = 0.3;
 const colors = [
@@ -38,23 +38,12 @@ const container = document.getElementById("container");
 const ballArray = [];
 
 class Ball {
-     constructor(
-          x = 0,
-          y = 0,
-          r = 5,
-          vx = 0.5,
-          vy = 0.5,
-          color = "#EF476F",
-          dx = 1,
-          dy = 1
-     ) {
+     constructor(x = 0, y = 0, r = 5, vx = 0.5, vy = 0.5, color = "#EF476F") {
           this.x = x;
           this.y = y;
           this.r = r;
           this.vx = vx;
           this.vy = vy;
-          this.dx = dx;
-          this.dy = dy;
           this.color = color;
 
           this.w = this.r * 2;
@@ -74,8 +63,8 @@ class Ball {
           this.element.style.left = `${this.x - this.r}px`; // so that x, y will be the centre of ball
 
           // Update ball's position
-          this.x += this.dx * this.vx;
-          this.y += this.dy * this.vy;
+          this.x += this.vx;
+          this.y += this.vy;
 
           this.handleBoxCollision();
           // comparing with all other balls for collision
@@ -104,16 +93,27 @@ class Ball {
           const distance = Math.sqrt(dx * dx + dy * dy);
           // collision
           if (distance < this.r + ballArray[i].r) {
-               console.log("collision");
-               this.vx = -this.vx;
-               this.vy = -this.vy;
+               // velocities are exchanged if masses are equal accordingto principle of elastic collision
+
+               // Swap velocities
+               const tempVx = this.vx;
+               const tempVy = this.vy;
+               this.vx = ballArray[i].vx;
+               this.vy = ballArray[i].vy;
+               ballArray[i].vx = tempVx;
+               ballArray[i].vy = tempVy;
 
                // prevents overlap
-               const penetrationDepth = this.r + ballArray[i].r - distance;
-               this.x += this.vx * penetrationDepth;
-               this.y += this.vy * penetrationDepth;
-               ballArray[i].x -= ballArray[i].vx * penetrationDepth;
-               ballArray[i].y -= ballArray[i].vy * penetrationDepth;
+               const penetrationDepth =
+                    (this.r + ballArray[i].r - distance) / 2; // length of overlapping of two balls
+               const angle = Math.atan2(dy, dx); // angle between the line connecting the centres of two balls and positve x axis
+               const moveX = penetrationDepth * Math.cos(angle); // consine gives x component
+               const moveY = penetrationDepth * Math.sin(angle); // sine gives y component
+
+               this.x += moveX;
+               this.y += moveY;
+               ballArray[i].x -= moveX;
+               ballArray[i].y -= moveY;
           }
      }
 }
@@ -130,7 +130,6 @@ function initializeBalls() {
           );
           ballArray.push(ball);
           container.appendChild(ball.element);
-          console.log(ball);
      }
 }
 
